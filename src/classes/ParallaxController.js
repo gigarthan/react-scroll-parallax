@@ -37,21 +37,29 @@ function ParallaxController({ scrollAxis = VERTICAL, scrollContainer }) {
     const supportsPassive = testForPassiveScroll();
 
     function _addListeners(el) {
-        el.addEventListener(
-            'scroll',
-            _handleScroll,
-            supportsPassive ? { passive: true } : false
-        );
-        window.addEventListener('resize', _handleResize, false);
+        if (typeof el !== 'undefined' && el.addEventListener) {
+            el.addEventListener(
+                'scroll',
+                _handleScroll,
+                supportsPassive ? { passive: true } : false
+            );
+        }
+        if (typeof window !== 'undefined' && window.addEventListener) {
+            window.addEventListener('resize', _handleResize, false);
+        }
     }
 
     function _removeListeners(el) {
-        el.removeEventListener(
-            'scroll',
-            _handleScroll,
-            supportsPassive ? { passive: true } : false
-        );
-        window.removeEventListener('resize', _handleResize, false);
+        if (typeof el !== 'undefined' && el.removeEventListener) {
+            el.removeEventListener(
+                'scroll',
+                _handleScroll,
+                supportsPassive ? { passive: true } : false
+            );
+        }
+        if (typeof window !== 'undefined' && window.removeEventListener) {
+            window.removeEventListener('resize', _handleResize, false);
+        }
     }
 
     _addListeners(viewEl);
@@ -138,7 +146,7 @@ function ParallaxController({ scrollAxis = VERTICAL, scrollContainer }) {
      * Gets the parallax elements in the controller
      * @return {array} parallax elements
      */
-    this.getElements = function() {
+    this.getElements = function () {
         return elements;
     };
 
@@ -148,7 +156,7 @@ function ParallaxController({ scrollAxis = VERTICAL, scrollContainer }) {
      * @param {object} options
      * @return {object} element
      */
-    this.createElement = function(options) {
+    this.createElement = function (options) {
         const newElement = new Element({ ...options, scrollAxis });
         newElement.setCachedAttributes(view, scroll);
         elements = [...elements, newElement];
@@ -160,7 +168,7 @@ function ParallaxController({ scrollAxis = VERTICAL, scrollContainer }) {
      * Remove an element by id
      * @param {object} element
      */
-    this.removeElementById = function(id) {
+    this.removeElementById = function (id) {
         if (!elements) return;
         elements = elements.filter(el => el.id !== id);
     };
@@ -170,7 +178,7 @@ function ParallaxController({ scrollAxis = VERTICAL, scrollContainer }) {
      * @param {object} element
      * @param {object} options
      */
-    this.updateElementPropsById = function(id, props) {
+    this.updateElementPropsById = function (id, props) {
         elements = elements.map(el => {
             if (el.id === id) {
                 return el.updateProps(props);
@@ -185,19 +193,19 @@ function ParallaxController({ scrollAxis = VERTICAL, scrollContainer }) {
      * Remove element styles.
      * @param {object} element
      */
-    this.resetElementStyles = function(element) {
+    this.resetElementStyles = function (element) {
         resetStyles(element);
     };
 
     /**
      * Updates all parallax element attributes and positions.
      */
-    this.update = function() {
+    this.update = function () {
         _setViewSize();
         _updateAllElements({ updateCache: true });
     };
 
-    this.updateScrollContainer = function(el) {
+    this.updateScrollContainer = function (el) {
         // remove existing listeners with current el first
         _removeListeners(viewEl);
 
@@ -212,7 +220,7 @@ function ParallaxController({ scrollAxis = VERTICAL, scrollContainer }) {
     /**
      * Removes listeners, reset all styles then nullifies the global ParallaxController.
      */
-    this.destroy = function() {
+    this.destroy = function () {
         _removeListeners(viewEl);
         elements.forEach(element => resetStyles(element));
         elements = undefined;
@@ -223,7 +231,7 @@ function ParallaxController({ scrollAxis = VERTICAL, scrollContainer }) {
  * Static method to instantiate the ParallaxController.
  * @returns {Object} ParallaxController
  */
-ParallaxController.init = function(options) {
+ParallaxController.init = function (options) {
     const hasWindow = typeof window !== 'undefined';
 
     if (!hasWindow) {
